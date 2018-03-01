@@ -1,7 +1,7 @@
 # simpleTodoList
 >use vuejs create a todolist component
 
-[demo]("http://www.willlin.cn/simpleTodoList/index.html")
+[demo](http://www.willlin.cn/simpleTodoList/index.html "demo")
 
 难点：
 
