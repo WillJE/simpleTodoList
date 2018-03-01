@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" type="text/css" href="css/reset-font-min.css">
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <title>Vue TodoList</title>
+</head>
+<body>
+    <div id="app">
+        <h1 class="title">Vue TodoList</h1>
+        <input type="text" placeholder="你今天想做什么？" v-model='new_todoText' v-on:keyup.enter = "addItem" class="inputBox">
+        <ul>
+            <li>
+                <todo-item v-for="(todo, index, filter) in list" :index="index" :filter="filter" :todo="todo" v-on:remove_todo="del(index)">
+                </todo-item>
+            </li>
+        </ul>
+        <div v-if="InComplementCount === 0 && filter === 'showAll'" class="mes">恭喜完成所有项目</div>
+        <hr>
+        <div class="controlBar">
+            <a v-on:click="setFilter('showAll')" class="btn">全部({{ AllCount }})</a>
+            <a v-on:click="setFilter('showComplete')" class="btn">已完成({{ ComplementCount }})</a>
+            <a v-on:click="setFilter('showUnComplete')" class="btn">未完成({{ InComplementCount }})</a>
+        </div>
+    </div>
+</body>
+<script src="js/vue.js"></script>
+<script src="js/todo_item.js"></script>
+<script>
+    var app = new Vue({
+        el: '#app',
+        data: {
+            item_list: {
+                "a5436691-350c-4ed0-862e-c8abc8509a4a": {
+                    "uuid": "a5436691-350c-4ed0-862e-c8abc8509a4a",
+                    "text": "買一本好書",
+                    "isCompleted": false,
+                    "isEdit": false
+                },
+                "a98bf666-a710-43b2-81b2-60c68ec4688d": {
+                    "uuid": "a98bf666-a710-43b2-81b2-60c68ec4688d",
+                    "text": "打電話給小明",
+                    "isCompleted": false,
+                    "isEdit": false
+                },
+                "452ef417-033d-48ff-9fec-9d686c105dce": {
+                    "uuid": "452ef417-033d-48ff-9fec-9d686c105dce",
+                    "text": "寫一篇文章",
+                    "isCompleted": false,
+                    "isEdit": false
+                }
+            },
+            new_todoText: "",
+            filter: 'showAll'
+        },
+        methods: {
+            addItem: function () {
+                var id = this._guid();
+                Vue.set(this.item_list, id, {
+                    "uuid": id,
+                    "text": this.new_todoText,
+                    "isCompleted": false,
+                    "isEdit": false
+                })
+                this.new_todoText = '';
+            },
+            _guid: function () {
+                return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                    var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+                    return v.toString(16);
+                });
+            },
+            del: function (index) {
+                Vue.delete(this.item_list,index);
+            },
+            setFilter: function (filter) {
+                this.filter = filter;
+                console.log(filter);
+            },
+            _getTodos: function (flag) {
+                var resultList = {};
+                for(item in this.item_list){
+                    if(flag === this.item_list[item].isCompleted){
+                        resultList[item] = this.item_list[item];
+                    }
+                }
+                return resultList;
+            }
+        },
+        computed: {
+            list: function () {
+                if(this.filter === 'showAll'){
+                    return this.item_list;
+                }else if(this.filter === 'showComplete'){
+                    return this._getTodos(true);    //返回已经完成的
+                }else{
+                    return this._getTodos(false);   //返回未完成的
+                }
+            },
+            InComplementCount : function () {
+                var _this = this;
+                return Object.keys(this.item_list).filter(function (value){
+                    return !_this.item_list[value].isCompleted
+                }).length;
+            },
+            ComplementCount: function () {
+                var _this = this;
+                return Object.keys(this.item_list).filter(function (value){
+                    return _this.item_list[value].isCompleted
+                }).length;
+            },
+            AllCount: function () {
+                return Object.keys(this.item_list).length;
+            }
+        }
+    })
+</script>
+</html>
